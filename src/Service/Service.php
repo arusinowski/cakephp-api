@@ -703,7 +703,11 @@ abstract class Service implements EventListenerInterface, EventDispatcherInterfa
     public function buildActionClass(string $class, array $route)
     {
         /** @var \CakeDC\Api\Service\Action\Action $actionInstance */
-        $actionInstance = new $class();
+        if ($this->container->has($class)) {
+            $actionInstance = $this->container->get($class);
+        } else {
+            $actionInstance = new $class();
+        }
         $actionInstance->startup($this->_actionOptions($route));
 
         return $actionInstance;
