@@ -80,12 +80,12 @@ abstract class Action implements EventListenerInterface, EventDispatcherInterfac
     protected ?string $_name = null;
 
     /**
-     * Action constructor.
+     * Startup an action instance
      *
      * @param array $config Configuration options passed to the constructor
      * @throws \Exception
      */
-    public function __construct(array $config = [])
+    public function startup(array $config = []): void
     {
         if (!empty($config['name'])) {
             $this->setName($config['name']);

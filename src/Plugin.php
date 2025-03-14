@@ -16,13 +16,39 @@ namespace CakeDC\Api;
 use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
+use Cake\Core\ContainerApplicationInterface;
+use Cake\Core\ContainerInterface;
+use Cake\Core\Exception\CakeException;
+use Cake\Core\PluginApplicationInterface;
 use CakeDC\Api\Command\ServiceRoutesCommand;
+use CakeDC\Api\Middleware\ParseApiRequestMiddleware;
+use CakeDC\Api\Middleware\ProcessApiRequestMiddleware;
 
 /**
  * Api plugin
  */
 class Plugin extends BasePlugin
 {
+    /**
+     * Container
+     *
+     * @var \Cake\Core\ContainerInterface|null
+     */
+    protected ?ContainerInterface $container = null;
+
+    public function bootstrap(PluginApplicationInterface $app): void
+    {
+        parent::bootstrap($app);
+
+        if (!in_array(ContainerApplicationInterface::class, class_implements($app), true)) {
+            throw new CakeException(
+                __('Your base application class is not implementing ContainerApplicationInterface.')
+            );
+        }
+        /** @var \Cake\Core\ContainerApplicationInterface|\Cake\Core\PluginApplicationInterface $app */
+        $this->container = $app->getContainer();
+    }
+
     /**
      * @inheritDoc
      */
@@ -47,6 +73,11 @@ class Plugin extends BasePlugin
                 if (array_key_exists('params', $middleware)) {
                     $options = $middleware['params'];
                     $routes->registerMiddleware($alias, new $class($options));
+                } elseif (
+                    ($class instanceof ParseApiRequestMiddleware) ||
+                    ($class instanceof ProcessApiRequestMiddleware)
+                ) {
+                    $routes->registerMiddleware($alias, new $class($this->container));
                 } else {
                     $routes->registerMiddleware($alias, new $class());
                 }

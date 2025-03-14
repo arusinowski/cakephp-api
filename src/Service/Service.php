@@ -15,6 +15,7 @@ namespace CakeDC\Api\Service;
 
 use Cake\Core\App;
 use Cake\Core\Configure;
+use Cake\Core\ContainerInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
@@ -134,6 +135,13 @@ abstract class Service implements EventListenerInterface, EventDispatcherInterfa
      */
     protected ?\Cake\Http\Response $_response = null;
 
+    /**
+     * Container
+     *
+     * @var \Cake\Core\ContainerInterface|null
+     */
+    protected ?ContainerInterface $container = null;
+
     protected string $_corsSuffix = '_cors';
 
     /**
@@ -169,6 +177,9 @@ abstract class Service implements EventListenerInterface, EventDispatcherInterfa
             $this->setResponse($config['response']);
         } else {
             $this->setResponse(new Response());
+        }
+        if (isset($config['container'])) {
+            $this->container = $config['container'];
         }
         if (isset($config['baseUrl'])) {
             $this->_baseUrl = $config['baseUrl'];
@@ -596,6 +607,7 @@ abstract class Service implements EventListenerInterface, EventDispatcherInterfa
                 'version' => $this->getVersion(),
                 'request' => $this->getRequest(),
                 'response' => $this->getResponse(),
+                'container' => $this->container,
                 'refresh' => true,
             ];
             $service = ServiceRegistry::getServiceLocator()->get($serviceName, $options);
@@ -686,10 +698,15 @@ abstract class Service implements EventListenerInterface, EventDispatcherInterfa
      * @param string $class Class name.
      * @param array $route Activated route.
      * @return mixed
+     * @throws \Exception
      */
     public function buildActionClass(string $class, array $route)
     {
-        return new $class($this->_actionOptions($route));
+        /** @var \CakeDC\Api\Service\Action\Action $actionInstance */
+        $actionInstance = new $class();
+        $actionInstance->startup($this->_actionOptions($route));
+
+        return $actionInstance;
     }
 
     /**

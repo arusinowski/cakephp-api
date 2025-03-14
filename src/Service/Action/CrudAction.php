@@ -70,12 +70,12 @@ abstract class CrudAction extends Action
     protected ?string $_finder = null;
 
     /**
-     * Action constructor.
+     * Startup an action instance
      *
      * @param array $config Configuration options passed to the constructor
      * @throws \Exception
      */
-    public function __construct(array $config = [])
+    public function startup(array $config = []): void
     {
         if (!empty($config['service'])) {
             $this->setService($config['service']);
@@ -105,9 +105,8 @@ abstract class CrudAction extends Action
         if (!empty($config['table'])) {
             $this->setTable($config['table']);
         }
-        parent::__construct($config);
+        parent::startup($config);
     }
-
     /**
      * Gets a Table instance.
      *

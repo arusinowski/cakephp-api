@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CakeDC\Api\Middleware;
 
+use Cake\Core\ContainerInterface;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,6 +26,23 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class ProcessApiRequestMiddleware implements MiddlewareInterface
 {
+    /**
+     * Container
+     *
+     * @var \Cake\Core\ContainerInterface|null
+     */
+    protected ?ContainerInterface $container;
+
+    /**
+     * Constructor
+     *
+     * @param \Cake\Core\ContainerInterface|null $container
+     */
+    public function __construct(?ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * Process an incoming server request.
      *

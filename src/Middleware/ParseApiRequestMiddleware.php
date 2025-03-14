@@ -15,6 +15,7 @@ namespace CakeDC\Api\Middleware;
 
 use Authentication\Authenticator\UnauthenticatedException;
 use Cake\Core\Configure;
+use Cake\Core\ContainerInterface;
 use Cake\Http\Response;
 use CakeDC\Api\Service\ConfigReader;
 use CakeDC\Api\Service\ServiceRegistry;
@@ -30,6 +31,23 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class ParseApiRequestMiddleware implements MiddlewareInterface
 {
+    /**
+     * Container
+     *
+     * @var \Cake\Core\ContainerInterface|null
+     */
+    protected ?ContainerInterface $container;
+
+    /**
+     * Constructor
+     *
+     * @param \Cake\Core\ContainerInterface|null $container
+     */
+    public function __construct(?ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * Process an incoming server request.
      *
@@ -90,6 +108,7 @@ class ParseApiRequestMiddleware implements MiddlewareInterface
             'service' => $serviceName,
             'version' => $version,
             'request' => $request,
+            'container' => $this->container,
             'baseUrl' => $url,
         ];
 
