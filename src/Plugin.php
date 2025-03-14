@@ -74,8 +74,8 @@ class Plugin extends BasePlugin
                     $options = $middleware['params'];
                     $routes->registerMiddleware($alias, new $class($options));
                 } elseif (
-                    ($class instanceof ParseApiRequestMiddleware) ||
-                    ($class instanceof ProcessApiRequestMiddleware)
+                    ($class === ParseApiRequestMiddleware::class) ||
+                    ($class === ProcessApiRequestMiddleware::class)
                 ) {
                     $routes->registerMiddleware($alias, new $class($this->container));
                 } else {
